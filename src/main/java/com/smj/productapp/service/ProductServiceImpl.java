@@ -35,6 +35,7 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public Mono<Void> deleteProduct(Long id) {
+        System.out.println("id"+id);
         return dao.deleteById(id);
     }
 }
