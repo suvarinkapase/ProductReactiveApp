@@ -33,14 +33,14 @@ public class ProductController {
         return service.getAllProducts();
     }
 
-    @PutMapping("/{id}")
+    @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public Mono<Products> updateProduct(@RequestBody Products product){
         return service.updateProduct(product);
     }
 
     @DeleteMapping("/{id}")
-    public Mono<Void> deleteProduct(Long id){
+    public Mono<Void> deleteProduct(@PathVariable("id") Long id){
         return service.deleteProduct(id);
     }
 }
