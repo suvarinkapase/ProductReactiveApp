@@ -1,7 +1,9 @@
 package com.smj.productapp.controlller;
 
+import com.smj.productapp.config.RabbitMQConfiguration;
 import com.smj.productapp.model.Products;
 import com.smj.productapp.service.ProductService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +18,13 @@ public class ProductController {
     @Autowired
     ProductService service;
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Mono<Products> saveProduct(@RequestBody Products product){
-      return service.saveProduct(product);
-    }
+    @Autowired
+    RabbitTemplate rabbitTemplate;
+//    @PostMapping
+//    @ResponseStatus(HttpStatus.CREATED)
+//    public Mono<Products> saveProduct(@RequestBody Products product){
+//      return service.saveProduct(product);
+//    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Mono<Products>> findById(@PathVariable("id") Long id){
@@ -42,5 +46,12 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public Mono<Void> deleteProduct(@PathVariable("id") Long id){
         return service.deleteProduct(id);
+    }
+
+    @PostMapping
+    public Mono<Products> saveProduct(@RequestBody Products product) {
+        rabbitTemplate.convertAndSend(RabbitMQConfiguration.PRODUCT_EXCHANGE,RabbitMQConfiguration.PRODUCT_ROUTING_KEY_A,product);
+        //rabbitTemplate.convertAndSend("product_exchange","product_routing_keyA",product);
+        return service.saveProduct(product);
     }
 }
